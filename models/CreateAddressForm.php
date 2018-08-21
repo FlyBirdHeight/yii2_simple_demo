@@ -23,7 +23,7 @@ class CreateAddressForm extends Model
     {
         return [
             [['user_id', 'consignee', 'phone', 'residence'], 'required'],
-//            ['phone', 'match', 'pattern' => '^((13[0-9])|(14[5|7])|(15([0-3]|[5-9]))|(18[0,5-9]))\\d{8}$'],
+            ['phone', 'match', 'pattern' => '^((13[0-9])|(14[5|7])|(15([0-3]|[5-9]))|(18[0,5-9]))\\d{8}$'],
             ['user_id', 'findUser']
         ];
     }

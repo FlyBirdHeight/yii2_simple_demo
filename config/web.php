@@ -26,6 +26,9 @@ $config = [
         'cache' => [
             'class' => 'yii\redis\Cache',
         ],
+        'aliases' => [
+            'class' => 'app\components\Alisaes'
+        ],
         'user' => [
             'identityClass' => 'app\models\User',
             'enableAutoLogin' => true,

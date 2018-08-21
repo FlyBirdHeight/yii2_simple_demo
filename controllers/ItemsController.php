@@ -3,18 +3,22 @@
 namespace app\controllers;
 
 use app\components\ReturnBehavior;
+use app\models\ItemForm;
+use app\models\UploadForm;
 use Yii;
 use app\models\Items;
 use app\models\ItemsSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\UploadedFile;
 
 /**
  * ItemsController implements the CRUD actions for Items model.
  */
 class ItemsController extends Controller
 {
+    public $enableCsrfValidation = false;
     /**
      * {@inheritdoc}
      */
@@ -29,89 +33,92 @@ class ItemsController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
+                    'create' => ['POST'],
+                    'update' => ['POST'],
+                    'upload' => ['POST'],
                 ],
             ],
         ];
     }
 
-    /**
-     * Lists all Items models.
-     * @return mixed
-     */
-    public function actionIndex()
-    {
-        $searchModel = new ItemsSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
-    }
-
-    /**
-     * Displays a single Items model.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionView($id)
-    {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
-    }
-
-    /**
-     * Creates a new Items model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
     public function actionCreate()
     {
-        $model = new Items();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        $post = Yii::$app->request->post();
+        $model = new ItemForm();
+        if ($model->load($post,'') && $model->create()){
+            return ['status' => 'success','response' => $model];
+        }else{
+            return ['status' => 'error','response' => $model];
         }
-
-        return $this->render('create', [
-            'model' => $model,
-        ]);
     }
 
-    /**
-     * Updates an existing Items model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionUpdate($id)
+    public function actionUpdate()
     {
-        $model = $this->findModel($id);
+        $request = Yii::$app->request;
+        if ($request->post('id')!=''){
+            $model = Items::findOne($request->post('id'));
+            if (isset($model)){
+                $model->name = $request->post('name');
+                $model->description = $request->post('description');
+                $model->price = $request->post('price');
+                $model->num = $request->post('num');
+                $model->updated_at = date('Y-m-d H:i:s',time());
+                $model->show_image = $request->post('show_image');
+                $model->avatar = $request->post('avatar');
+                if ($model->save()){
+                    return ['status' => 'success','response' => $model];
+                }else{
+                    return ['status' => 'error','response' => 'error'];
+                }
+            }else{
+                return ['status' => 'error','response' => 'error'];
+            }
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        }else{
+            return ['status' => 'error','response' => 'error'];
         }
-
-        return $this->render('update', [
-            'model' => $model,
-        ]);
     }
 
-    /**
-     * Deletes an existing Items model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $item = Items::findOne($id);
+        if (isset($item)){
+            if ($item->delete()){
+                return ['status' => 'success','response' => 'success'];
+            }else{
+                return ['status' => 'error','response' => 'error'];
+            }
+        }else{
+            return ['status' => 'error','response' => 'error'];
+        }
+    }
 
-        return $this->redirect(['index']);
+    public function actionFind($id)
+    {
+        $item = Items::findOne($id);
+        if (isset($item)){
+            return ['status' => 'success','response' => $item];
+        }else{
+            return ['status' => 'error','response' => 'error'];
+        }
+    }
+
+    public function actionUpload(){
+        $model = new UploadForm();
+
+        if (Yii::$app->request->isPost) {
+            $model->images = UploadedFile::getInstance($model,'images');
+
+            if ($model->images && $model->validate()) {
+                $path = \Yii::$app->aliases->getUpload() . $model->images->baseName . '.' . $model->images->extension;
+                $model->images->saveAs($path);
+                return ['status' => 'success', 'response' => $path];
+            }
+            return ['status' => 'error', 'response' => 'error'];
+        }
+        return ['status' => 'error', 'response' => 'error'];
+
     }
 
     /**

@@ -93,7 +93,7 @@ class AddressController extends Controller
     }
 
     public function actionFind($id){
-        $model = Address::findOne($id);
+        $model = $this->findModel($id);
         if (isset($model)){
             return ['status' => 'success','response' => $model];
         }else{
@@ -113,7 +113,6 @@ class AddressController extends Controller
         if (($model = Address::findOne($id)) !== null) {
             return $model;
         }
-
         return null;
     }
 }

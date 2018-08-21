@@ -54,6 +54,8 @@ class Items extends \yii\db\ActiveRecord
             'sell_count' => 'Sell Count',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
+            'avatar' => 'Avatar',
+            'show_image' => 'Show Image',
         ];
     }
 
