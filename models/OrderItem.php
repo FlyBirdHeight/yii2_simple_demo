@@ -25,6 +25,18 @@ class OrderItem extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
+    public function rules()
+    {
+        return [
+            [['order_id', 'item_id'], 'required'],
+            [['order_id', 'item_id'], 'integer'],
+            [['order_id'], 'exist', 'skipOnError' => true, 'targetClass' => Orders::className(), 'targetAttribute' => ['order_id' => 'id']],
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function attributeLabels()
     {
         return [
@@ -39,10 +51,5 @@ class OrderItem extends \yii\db\ActiveRecord
     public function getOrder()
     {
         return $this->hasOne(Orders::className(), ['id' => 'order_id']);
-    }
-
-    public function getItem()
-    {
-        return $this->hasOne(Items::className(), ['id' => 'item_id']);
     }
 }

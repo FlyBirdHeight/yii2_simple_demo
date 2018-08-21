@@ -19,7 +19,9 @@ class m180821_015916_create_address_table extends Migration
             'code' => $this->string(),
             'residence' => $this->string()->notNull(),
             'phone' => $this->string()->notNull(),
-            'default' => $this->integer()->defaultValue(0)
+            'default' => $this->integer()->defaultValue(0),
+            'created_at' => $this->timestamp(),
+            'updated_at' => $this->timestamp(),
         ]);
 
         $this->addForeignKey(

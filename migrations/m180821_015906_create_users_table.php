@@ -20,6 +20,9 @@ class m180821_015906_create_users_table extends Migration
             'order_count' => $this->double()->defaultValue(0),
             'use_money' => $this->double()->defaultValue(0),
             'money' => $this->double()->defaultValue(0),
+            'access_token' => $this->string(),
+            'created_at' => $this->timestamp(),
+            'updated_at' => $this->timestamp(),
         ]);
     }
 

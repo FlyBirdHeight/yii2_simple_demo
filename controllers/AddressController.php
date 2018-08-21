@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\components\ReturnBehavior;
+use app\models\CreateAddressForm;
 use Yii;
 use app\models\Address;
 use app\models\AddressSearch;
@@ -15,6 +16,7 @@ use yii\filters\VerbFilter;
  */
 class AddressController extends Controller
 {
+    public $enableCsrfValidation = false;
     /**
      * {@inheritdoc}
      */
@@ -29,89 +31,74 @@ class AddressController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
+                    'create' => ['POST'],
+                    'update' => ['POST'],
+                    'find' => ['GET'],
                 ],
             ],
         ];
     }
 
-    /**
-     * Lists all Address models.
-     * @return mixed
-     */
-    public function actionIndex()
-    {
-        $searchModel = new AddressSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
-    }
-
-    /**
-     * Displays a single Address model.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionView($id)
-    {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
-    }
-
-    /**
-     * Creates a new Address model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
     public function actionCreate()
     {
-        $model = new Address();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        $post = Yii::$app->request->post();
+        $model = new CreateAddressForm();
+        if ($model->load($post,'') && $model->create()){
+            return ['status' => 'success','response' => $model];
+        }else{
+            var_dump($model->getErrors());
+            return ['status' => 'error','response' => $model];
         }
-
-        return $this->render('create', [
-            'model' => $model,
-        ]);
     }
 
-    /**
-     * Updates an existing Address model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionUpdate($id)
+    public function actionUpdate()
     {
-        $model = $this->findModel($id);
+        $request = Yii::$app->request;
+        if ($request->post('id')!=''){
+            $model = Address::findOne($request->post('id'));
+            if (isset($model)){
+                $model->code = $request->post('code');
+                $model->consignee = $request->post('consignee');
+                $model->phone = $request->post('phone');
+                $model->residence = $request->post('residence');
+                $model->updated_at = date('Y-m-d H:i:s',time());
+                if ($model->save()){
+                    return ['status' => 'success','response' => $model];
+                }else{
+                    return ['status' => 'error','response' => 'error'];
+                }
+            }else{
+                return ['status' => 'error','response' => 'error'];
+            }
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        }else{
+            return ['status' => 'error','response' => 'error'];
         }
 
-        return $this->render('update', [
-            'model' => $model,
-        ]);
     }
 
-    /**
-     * Deletes an existing Address model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = Address::findOne($id);
+        if (isset($model)){
+            if ($model->delete()){
+                return ['status' => 'success','response' => 'success'];
+            }else{
+                return ['status' => 'error','response' => 'error'];
+            }
+        }else{
+            return ['status' => 'error','response' => 'error'];
+        }
 
-        return $this->redirect(['index']);
+    }
+
+    public function actionFind($id){
+        $model = Address::findOne($id);
+        if (isset($model)){
+            return ['status' => 'success','response' => $model];
+        }else{
+            return ['status' => 'error','response' => 'error'];
+        }
     }
 
     /**
@@ -127,6 +114,6 @@ class AddressController extends Controller
             return $model;
         }
 
-        throw new NotFoundHttpException('The requested page does not exist.');
+        return null;
     }
 }

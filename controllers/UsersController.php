@@ -3,6 +3,9 @@
 namespace app\controllers;
 
 use app\components\ReturnBehavior;
+use app\models\RegisterForm;
+use app\models\RewritePasswordForm;
+use app\models\UserLoginForm;
 use Yii;
 use app\models\Users;
 use app\models\UsersSearch;
@@ -15,6 +18,15 @@ use yii\filters\VerbFilter;
  */
 class UsersController extends Controller
 {
+    public $enableCsrfValidation = false;
+
+    private $redis;
+
+    public function init()
+    {
+        $this->redis = Yii::$app->redis;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -28,90 +40,81 @@ class UsersController extends Controller
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'delete' => ['POST'],
+                    'login' => ['POST'],
+                    'register' => ['POST'],
+                    'logout' => ['POST'],
+                    'rewrite-password' => ['POST']
                 ],
             ],
         ];
     }
 
-    /**
-     * Lists all Users models.
-     * @return mixed
-     */
-    public function actionIndex()
-    {
-        $searchModel = new UsersSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
-    }
-
-    /**
-     * Displays a single Users model.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionView($id)
-    {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
-    }
-
-    /**
-     * Creates a new Users model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-    public function actionCreate()
-    {
-        $model = new Users();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+    public function actionRegister(){
+        $model = new RegisterForm();
+        if ($model->load(Yii::$app->request->post(),'') && $model->register()){
+            return ['status' => 'success','response' => $model];
+        }else{
+            return ['status' => 'error','response' => $model];
         }
-
-        return $this->render('create', [
-            'model' => $model,
-        ]);
     }
 
-    /**
-     * Updates an existing Users model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionUpdate($id)
-    {
-        $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+    public function actionLogin(){
+        $post = Yii::$app->request->post();
+        $login = new UserLoginForm();
+        if ($this->redis->exists($post['email'])){
+            return ['status' => 'error', 'response' => 'online'];
+        }else{
+            if ($login->load($post,'') && $login->validate()){
+                $user = $login->login();
+                $this->redis->set($post['email'],json_encode($user));
+                return ['status' => 'success', 'response' => $user];
+            }else{
+                return ['status' => 'error', 'response' => 'error'];
+            }
         }
-
-        return $this->render('update', [
-            'model' => $model,
-        ]);
     }
 
-    /**
-     * Deletes an existing Users model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionDelete($id)
+    public function actionLogout()
     {
-        $this->findModel($id)->delete();
+        $post = Yii::$app->request->post();
+        if ($this->redis->exists($post['email'])){
+            $this->redis->del($post['email']);
+            return ['status' => 'success','response' => '退出成功'];
+        }else{
+            return ['status' => 'error','response' => '未登陆'];
+        }
+    }
 
-        return $this->redirect(['index']);
+    public function actionRewritePassword()
+    {
+        $post = Yii::$app->request->post();
+        $model = new RewritePasswordForm();
+        if ($model->load($post,'') && $model->rewritePassword()){
+            return ['status' => 'success', 'response' => 'success'];
+        }else{
+            var_dump($model->getErrors());
+            return ['status' => 'error', 'response' => $model];
+        }
+    }
+
+    public function actionUser($id){
+        $model = Users::findOne($id);
+        if ($model){
+            return ['status' => 'success', 'response' => $model];
+        }else{
+            return ['status' => 'error', 'response' => 'empty'];
+        }
+    }
+
+    public function actionAddress($id){
+        $user = Users::findOne($id);
+        if (!$user){
+            return ['status' => 'error', 'response' => 'error'];
+        }else{
+            $address = $user->addresses;
+            return ['status' => 'success', 'response' => $address];
+        }
     }
 
     /**
@@ -127,6 +130,6 @@ class UsersController extends Controller
             return $model;
         }
 
-        throw new NotFoundHttpException('The requested page does not exist.');
+        return null;
     }
 }
