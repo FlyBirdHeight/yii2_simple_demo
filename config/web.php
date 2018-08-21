@@ -7,6 +7,9 @@ $config = [
     'id' => 'basic',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
+    'charset' => 'utf-8',
+    'language' => 'zh-CN',
+    'timeZone' => 'Asia/Shanghai',
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
@@ -38,19 +41,35 @@ $config = [
             'targets' => [
                 [
                     'class' => 'yii\log\FileTarget',
-                    'levels' => ['error', 'warning'],
+                    'levels' => ['error', 'warning','trace'],
+                    'targets' => [
+                        [
+                            'class' => 'yii\log\FileTarget',
+                            'levels' => ['error', 'warning','trace'],
+                            'prefix' => function ($message) {
+                                $user = Yii::$app->has('user', true) ? Yii::$app->get('user') : null;
+                                $userID = $user ? $user->getId(false) : '-';
+                                return "[$userID]";
+                            }
+                        ],
+                    ],
                 ],
             ],
         ],
         'db' => $db,
-        /*
         'urlManager' => [
             'enablePrettyUrl' => true,
-            'showScriptName' => false,
+            'showScriptName' => true,
+            'enableStrictParsing' => false,
+            'suffix' => '',
             'rules' => [
             ],
         ],
-        */
+        'session' => [
+            'class' => 'yii\web\DbSession',
+//            'db' => 'mydb',  // 数据库连接的应用组件ID，默认为'db'.
+            'sessionTable' => 'my_session', // session 数据表名，默认为'session'.
+        ],
     ],
     'params' => $params,
 ];
