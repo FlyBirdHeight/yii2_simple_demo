@@ -42,17 +42,11 @@ $config = [
                 [
                     'class' => 'yii\log\FileTarget',
                     'levels' => ['error', 'warning','trace'],
-                    'targets' => [
-                        [
-                            'class' => 'yii\log\FileTarget',
-                            'levels' => ['error', 'warning','trace'],
-                            'prefix' => function ($message) {
-                                $user = Yii::$app->has('user', true) ? Yii::$app->get('user') : null;
-                                $userID = $user ? $user->getId(false) : '-';
-                                return "[$userID]";
-                            }
-                        ],
-                    ],
+                    'prefix' => function ($message) {
+                        $user = Yii::$app->has('user', true) ? Yii::$app->get('user') : null;
+                        $userID = $user ? $user->getId(false) : '-';
+                        return "[$userID]";
+                    }
                 ],
             ],
         ],
@@ -64,11 +58,6 @@ $config = [
             'suffix' => '',
             'rules' => [
             ],
-        ],
-        'session' => [
-            'class' => 'yii\web\DbSession',
-//            'db' => 'mydb',  // 数据库连接的应用组件ID，默认为'db'.
-            'sessionTable' => 'my_session', // session 数据表名，默认为'session'.
         ],
     ],
     'params' => $params,
