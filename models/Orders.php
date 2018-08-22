@@ -61,19 +61,24 @@ class Orders extends \yii\db\ActiveRecord
         ];
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getOrderItems()
+    public function getItems()
     {
-        return $this->hasMany(OrderItem::className(), ['order_id' => 'id']);
+        return $this->hasMany(Items::className(), ['id' => 'item_id'])
+            ->viaTable('order_item', ['order_id' => 'id'])
+            ->select(['id','name','description','avatar','num'])
+            ->asArray();
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getUser()
+    public function getUsers()
     {
-        return $this->hasOne(Users::className(), ['id' => 'user_id']);
+        return $this->hasOne(Users::className(), ['id' => 'user_id'])->select(['email','name','id','order_count']);
+    }
+
+    public function getAddress()
+    {
+        return $this->hasOne(Address::className(), ['id' => 'address_id'])->select(['id','user_id','phone','code','consignee','residence']);
     }
 }

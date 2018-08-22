@@ -60,8 +60,9 @@ class Items extends \yii\db\ActiveRecord
         ];
     }
 
-    public function getOrder(){
-        return $this->hasMany(Orders::className(),['id','order_id'])
-            ->viaTable(OrderItem::className(),['item_id','id']);
+    public function getOrders(){
+        return $this->hasMany(Orders::className(),['id' => 'order_id'])
+            ->viaTable('order_item',['item_id' => 'id'])
+            ->asArray();
     }
 }

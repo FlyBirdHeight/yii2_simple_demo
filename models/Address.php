@@ -63,4 +63,11 @@ class Address extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Users::className(), ['id' => 'user_id']);
     }
+
+    public function fields()
+    {
+        $fields = parent::fields();
+        unset($fields['default']);
+        return $fields;
+    }
 }

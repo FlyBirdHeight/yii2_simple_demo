@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\components\ReturnBehavior;
 use app\events\AddOrderCount;
+use app\events\CreateOrderItem;
 use app\models\Address;
 use app\models\Items;
 use Yii;
@@ -83,6 +84,7 @@ class OrdersController extends Controller
                                         $order->item_count = $count;
                                         $order->total = $total;
                                         $order->save();
+                                        $tb->commit();
                                     }else{
                                         $order = new Orders();
                                         $order->order_code =  date('ymd').substr(implode(NULL, array_map('ord', str_split(substr(uniqid(), 7, 13), 1))), 0, 8);
@@ -92,6 +94,7 @@ class OrdersController extends Controller
                                         $order->address_id = $post['address_id'];
                                         if($order->save()){
                                             $order_id = $order->id;
+                                            $order->link('items',Items::findOne($key),['num' => $value->num, 'total' => $value->total]);
                                             $event->user_id = $post['user_id'];
                                             $this->trigger(self::EVENT_ADD_ORDER_COUNT,$event);
                                             $tb->commit();
@@ -100,7 +103,6 @@ class OrdersController extends Controller
                                 }
                             }
                             else{
-
                                 return ['status' => 'error', 'response' => 'Some mistakes '];
                             }
                         }catch (\Exception $e){
@@ -131,7 +133,7 @@ class OrdersController extends Controller
     }
 
     public function actionFind($id){
-        $data = Orders::findOne($id);
+        $data = Orders::find()->where(['id'=>$id])->with(['items','users','address'])->asArray()->all();
         if ($data!=null){
             return ['status' => 'success', 'response' => $data];
         }else{

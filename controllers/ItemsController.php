@@ -98,7 +98,9 @@ class ItemsController extends Controller
 
     public function actionFind($id)
     {
-        $item = Items::findOne($id);
+        $item = Items::find()->where(['id'=>$id])->with(['orders' => function($query){
+            $query->with(['user','address']);
+        }])->asArray()->all();
         if (isset($item)){
             return ['status' => 'success','response' => $item];
         }else{

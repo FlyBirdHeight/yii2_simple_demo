@@ -42,6 +42,8 @@ class OrderItem extends \yii\db\ActiveRecord
         return [
             'order_id' => 'Order ID',
             'item_id' => 'Item ID',
+            'num' => 'Num',
+            'total' => 'Total'
         ];
     }
 
@@ -52,4 +54,5 @@ class OrderItem extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Orders::className(), ['id' => 'order_id']);
     }
+
 }
