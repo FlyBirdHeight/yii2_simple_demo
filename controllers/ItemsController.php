@@ -8,6 +8,7 @@ use app\models\UploadForm;
 use Yii;
 use app\models\Items;
 use app\models\ItemsSearch;
+use yii\data\Pagination;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -36,6 +37,7 @@ class ItemsController extends Controller
                     'create' => ['POST'],
                     'update' => ['POST'],
                     'upload' => ['POST'],
+                    'all'    => ['POST'],
                 ],
             ],
         ];
@@ -105,19 +107,31 @@ class ItemsController extends Controller
     }
 
     public function actionUpload(){
-        $model = new UploadForm();
+        $form = new UploadForm([
+            'images' => UploadedFile::getInstanceByName('images')
+        ]);
 
-        if (Yii::$app->request->isPost) {
-            $model->images = UploadedFile::getInstance($model,'images');
-
-            if ($model->images && $model->validate()) {
-                $path = \Yii::$app->aliases->getUpload() . $model->images->baseName . '.' . $model->images->extension;
-                $model->images->saveAs($path);
-                return ['status' => 'success', 'response' => $path];
-            }
-            return ['status' => 'error', 'response' => 'error'];
+        if($form->upload()){
+            return ['status' => 'success' , 'avatar' => Yii::$app->urlManager->baseUrl . $form->savePath];
+        }else{
+            return ['status' => 'error' , 'avatar' => null];
         }
-        return ['status' => 'error', 'response' => 'error'];
+    }
+
+
+    public function actionAll(){
+        $post = Yii::$app->request->post();
+        $items = Items::find()->orderBy('num');
+        $count = $items->count();
+        if ($count!=0){
+            $pagination = new Pagination(['totalCount' => $count]);
+            $pagination->pageSize = $post['pageSize'];
+            $pagination->page = $post['currentPage']-1;
+            $data = $items->offset($pagination->offset)->limit($pagination->limit)->all();
+            return ['status' => 'success', 'response' => $data];
+        }else{
+            return ['status' => 'error', 'response' => 'empty'];
+        }
 
     }
 
