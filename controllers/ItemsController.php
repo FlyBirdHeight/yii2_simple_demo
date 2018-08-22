@@ -132,7 +132,6 @@ class ItemsController extends Controller
         }else{
             return ['status' => 'error', 'response' => 'empty'];
         }
-
     }
 
     /**

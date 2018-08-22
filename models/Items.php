@@ -56,6 +56,7 @@ class Items extends \yii\db\ActiveRecord
             'updated_at' => 'Updated At',
             'avatar' => 'Avatar',
             'show_image' => 'Show Image',
+            'version' => 'Version',
         ];
     }
 

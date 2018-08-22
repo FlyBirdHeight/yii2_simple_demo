@@ -103,5 +103,10 @@ class Users extends ActiveRecord
         $this->access_token = Yii::$app->security->generateRandomString();
     }
 
+    public function addOrderCount($event){
+        $user = self::findOne($event->user_id);
+        $user->order_count++;
+        $user->save(false);
+    }
 
 }

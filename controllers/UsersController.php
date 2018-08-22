@@ -62,24 +62,25 @@ class UsersController extends Controller
     public function actionLogin(){
         $post = Yii::$app->request->post();
         $login = new UserLoginForm();
-        if ($this->redis->exists($post['email'])){
-            return ['status' => 'error', 'response' => 'online'];
-        }else{
-            if ($login->load($post,'') && $login->validate()){
-                $user = $login->login();
-                $this->redis->set($post['email'],json_encode($user));
-                return ['status' => 'success', 'response' => $user];
+        if ($login->load($post,'') && $login->validate()){
+            $user = $login->login();
+            if ($this->redis->hexists('online','user:'.$user->id)){
+                return ['status' => 'error', 'response' => 'online'];
             }else{
-                return ['status' => 'error', 'response' => 'error'];
+                $this->redis->hset('online','user:'.$user->id,$user->email);
+                return ['status' => 'success', 'response' => $user];
             }
+        }else{
+            return ['status' => 'error', 'response' => 'error'];
         }
+
     }
 
     public function actionLogout()
     {
         $post = Yii::$app->request->post();
-        if ($this->redis->exists($post['email'])){
-            $this->redis->del($post['email']);
+        if ($this->redis->hexists('online','user:'.$post['user_id'])){
+            $this->redis->hdel('online','user:'.$post['user_id']);
             return ['status' => 'success','response' => '退出成功'];
         }else{
             return ['status' => 'error','response' => '未登陆'];
