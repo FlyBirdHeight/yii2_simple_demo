@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use yii\db\ActiveRecord;
+use yii\web\IdentityInterface;
 
 /**
  * This is the model class for table "users".
@@ -19,8 +20,65 @@ use yii\db\ActiveRecord;
  * @property Address[] $addresses
  * @property Orders[] $orders
  */
-class Users extends ActiveRecord
+class Users extends ActiveRecord implements IdentityInterface
 {
+    /**
+     * 根据给到的ID查询身份。
+     *
+     * @param string|integer $id 被查询的ID
+     * @return IdentityInterface|null 通过ID匹配到的身份对象
+     */
+    public static function findIdentity($id)
+    {
+        return static::findOne($id);
+    }
+
+    /**
+     * 根据 token 查询身份。
+     *
+     * @param string $token 被查询的 token
+     * @return IdentityInterface|null 通过 token 得到的身份对象
+     */
+    public static function findIdentityByAccessToken($token, $type = null)
+    {
+        return static::findOne(['access_token' => $token]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAuthKey()
+    {
+        return $this->authKey;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function validateAuthKey($authKey)
+    {
+        return $this->authKey === $authKey;
+    }
+
+    public function beforeSave($insert)
+    {
+        if (parent::beforeSave($insert)) {
+            if ($this->isNewRecord) {
+                $this->auth_key = Yii::$app->security->generateRandomString();
+            }
+            return true;
+        }
+        return false;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -58,6 +116,7 @@ class Users extends ActiveRecord
             'use_money' => 'Use Money',
             'money' => 'Money',
             'access_token' => 'Access Token',
+            'auth_key' => 'Auth Key'
         ];
     }
 
@@ -99,6 +158,11 @@ class Users extends ActiveRecord
     }
 
     public function generateAuthKey()
+    {
+        $this->auth_key = Yii::$app->security->generateRandomString();
+    }
+
+    public function generateAccessToken()
     {
         $this->access_token = Yii::$app->security->generateRandomString();
     }

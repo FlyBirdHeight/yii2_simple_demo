@@ -64,6 +64,7 @@ class UsersController extends Controller
         $login = new UserLoginForm();
         if ($login->load($post,'') && $login->validate()){
             $user = $login->login();
+//            Yii::$app->user->login($user);
             if ($this->redis->hexists('online','user:'.$user->id)){
                 return ['status' => 'error', 'response' => 'online'];
             }else{
@@ -79,6 +80,7 @@ class UsersController extends Controller
     public function actionLogout()
     {
         $post = Yii::$app->request->post();
+//        Yii::$app->user->logout();
         if ($this->redis->hexists('online','user:'.$post['user_id'])){
             $this->redis->hdel('online','user:'.$post['user_id']);
             return ['status' => 'success','response' => '退出成功'];
