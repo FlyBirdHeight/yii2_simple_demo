@@ -3,9 +3,12 @@
 namespace app\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
-
+use yii\web\Link;
+use yii\web\Linkable;
+use yii\helpers\Url;
 /**
  * This is the model class for table "users".
  *
@@ -20,7 +23,7 @@ use yii\web\IdentityInterface;
  * @property Address[] $addresses
  * @property Orders[] $orders
  */
-class Users extends ActiveRecord implements IdentityInterface
+class Users extends ActiveRecord implements IdentityInterface,Linkable
 {
     /**
      * 根据给到的ID查询身份。
@@ -31,6 +34,20 @@ class Users extends ActiveRecord implements IdentityInterface
     public static function findIdentity($id)
     {
         return static::findOne($id);
+    }
+
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => TimestampBehavior::className(),
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_INSERT => ['created_at', 'updated_at'],
+                    ActiveRecord::EVENT_BEFORE_UPDATE => ['updated_at']
+                ],
+                'value' => date('Y-m-d H:i:s'),
+            ],
+        ];
     }
 
     /**
@@ -94,11 +111,9 @@ class Users extends ActiveRecord implements IdentityInterface
     {
         return [
             [['email', 'password', 'name'], 'required'],
-            [['order_count', 'use_money', 'money'], 'number', 'default', 'value' => 0],
             [['email', 'name'], 'string', 'max' => 255],
             [['email'], 'unique'],
             [['name'], 'unique'],
-            [['created_at', 'updated_at'], 'default', 'value' => date('Y-m-d H:i:s')],
         ];
     }
 
@@ -116,7 +131,9 @@ class Users extends ActiveRecord implements IdentityInterface
             'use_money' => 'Use Money',
             'money' => 'Money',
             'access_token' => 'Access Token',
-            'auth_key' => 'Auth Key'
+            'auth_key' => 'Auth Key',
+            'created_time' => 'Created Time',
+            'updated_time' => 'Updated time'
         ];
     }
 
@@ -171,6 +188,16 @@ class Users extends ActiveRecord implements IdentityInterface
         $user = self::findOne($event->user_id);
         $user->order_count++;
         $user->save(false);
+    }
+
+    public function getLinks()
+    {
+        return [
+            'find' => Url::to(['users/find', 'id' => $this->id], true),
+            'address' => Url::to(['users/address', 'id' => $this->id], true),
+            'logout' => Url::to(['users/logout'], true),
+            'rewrite-password' => Url::to(['users/rewrite-password'], true),
+        ];
     }
 
 }

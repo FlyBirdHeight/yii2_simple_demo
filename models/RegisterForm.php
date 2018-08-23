@@ -52,7 +52,7 @@ class RegisterForm extends Model
         $user->generateAuthKey();
         $user->generateAccessToken();
 
-        return $user->save(false);
+        return $user->save();
 
 //        $auth = \Yii::$app->authManager;
 //        $authorRole = $auth->getRole('admin');

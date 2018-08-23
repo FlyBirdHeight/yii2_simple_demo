@@ -63,7 +63,7 @@ class ItemsController extends Controller
         if ($model->load($post,'') && $model->create()){
             return ['status' => 'success','response' => $model];
         }else{
-            return ['status' => 'error','response' => $model];
+            return ['status' => 'error','response' => $model->getErrors()];
         }
     }
 
@@ -83,10 +83,10 @@ class ItemsController extends Controller
                 if ($model->save()){
                     return ['status' => 'success','response' => $model];
                 }else{
-                    return ['status' => 'error','response' => 'error'];
+                    return ['status' => 'error','response' => $model->getErrors()];
                 }
             }else{
-                return ['status' => 'error','response' => 'error'];
+                return ['status' => 'error','response' => null];
             }
 
         }else{
@@ -104,7 +104,7 @@ class ItemsController extends Controller
                 return ['status' => 'error','response' => 'error'];
             }
         }else{
-            return ['status' => 'error','response' => 'error'];
+            return ['status' => 'error','response' => null];
         }
     }
 
@@ -116,7 +116,7 @@ class ItemsController extends Controller
         if (isset($item)){
             return ['status' => 'success','response' => $item];
         }else{
-            return ['status' => 'error','response' => 'error'];
+            return ['status' => 'error','response' => null];
         }
     }
 

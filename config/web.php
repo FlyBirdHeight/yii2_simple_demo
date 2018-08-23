@@ -67,6 +67,22 @@ $config = [
             'enableStrictParsing' => false,
             'suffix' => '',
             'rules' => [
+                [
+                    'class'          => 'yii\rest\UrlRule',
+                    'controller'     => 'users',
+                ],
+                [
+                    'class'          => 'yii\rest\UrlRule',
+                    'controller'     => 'orders',
+                ],
+                [
+                    'class'          => 'yii\rest\UrlRule',
+                    'controller'     => 'address',
+                ],
+                [
+                    'class'          => 'yii\rest\UrlRule',
+                    'controller'     => 'items',
+                ]
             ],
         ],
         'redis' => [

@@ -32,7 +32,7 @@ class UserLoginForm extends Model
         if (!$this->hasErrors()) {
             $user = Users::findByEmail($this->email);
             if (!$user || !$user->validatePassword($this->password)) {
-                $this->addError($attribute, 'Incorrect username or password.');
+                $this->addError($attribute, '用户名或密码错误!');
             }
         }
     }

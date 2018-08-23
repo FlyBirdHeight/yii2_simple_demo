@@ -65,7 +65,7 @@ class UsersController extends Controller
         if ($model->load(Yii::$app->request->post(),'') && $model->register()){
             return ['status' => 'success','response' => $model];
         }else{
-            return ['status' => 'error','response' => $model];
+            return ['status' => 'error','response' => $model->getErrors()];
         }
     }
 
@@ -83,7 +83,7 @@ class UsersController extends Controller
                 return ['status' => 'success', 'response' => $user];
             }
         }else{
-            return ['status' => 'error', 'response' => 'error'];
+            return ['status' => 'error', 'response' => $login->getErrors()];
         }
 
     }
@@ -107,8 +107,8 @@ class UsersController extends Controller
         if ($model->load($post,'') && $model->rewritePassword()){
             return ['status' => 'success', 'response' => 'success'];
         }else{
-            var_dump($model->getErrors());
-            return ['status' => 'error', 'response' => $model];
+//            var_dump($model->getErrors());
+            return ['status' => 'error', 'response' => $model->getErrors()];
         }
     }
 

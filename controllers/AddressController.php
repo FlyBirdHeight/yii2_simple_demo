@@ -60,7 +60,7 @@ class AddressController extends Controller
             return ['status' => 'success','response' => $model];
         }else{
             var_dump($model->getErrors());
-            return ['status' => 'error','response' => $model];
+            return ['status' => 'error','response' => $model->getErrors()];
         }
     }
 
@@ -100,7 +100,7 @@ class AddressController extends Controller
                 return ['status' => 'error','response' => 'error'];
             }
         }else{
-            return ['status' => 'error','response' => 'error'];
+            return ['status' => 'error','response' => null];
         }
 
     }
@@ -110,7 +110,7 @@ class AddressController extends Controller
         if (isset($model)){
             return ['status' => 'success','response' => $model];
         }else{
-            return ['status' => 'error','response' => 'error'];
+            return ['status' => 'error','response' => null];
         }
     }
 

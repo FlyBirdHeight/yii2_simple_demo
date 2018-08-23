@@ -115,10 +115,10 @@ class OrdersController extends Controller
                                 }
                             }
                             else{
-                                return ['status' => 'error', 'response' => 'Some mistakes '];
+                                return ['status' => 'error', 'response' => '商品货源不足！'];
                             }
                         }catch (\Exception $e){
-                            return ['status' => 'error', 'response' => 'error'];
+                            return ['status' => 'error', 'response' => $e->getMessage()];
                         }
                     }
                     Yii::$app->redis->del('user:'.$post['user_id']);

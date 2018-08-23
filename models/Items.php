@@ -3,6 +3,8 @@
 namespace app\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "items".
@@ -57,6 +59,20 @@ class Items extends \yii\db\ActiveRecord
             'avatar' => 'Avatar',
             'show_image' => 'Show Image',
             'version' => 'Version',
+        ];
+    }
+
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => TimestampBehavior::className(),
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_INSERT => ['created_at', 'updated_at'],
+                    ActiveRecord::EVENT_BEFORE_UPDATE => ['updated_at']
+                ],
+                'value' => date('Y-m-d H:i:s'),
+            ],
         ];
     }
 
