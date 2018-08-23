@@ -8,6 +8,7 @@ use app\models\Items;
 use Yii;
 use app\models\Address;
 use app\models\AddressSearch;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -28,6 +29,16 @@ class AddressController extends Controller
                 'class' => ReturnBehavior::className(),
                 'return_type' => 'json',
             ],
+//            'access' => [
+//                'class' => AccessControl::className(),
+//                'rules' => [
+//                    [
+//                        'actions' => ['delete','create','update','find'],
+//                        'allow' => true,
+//                        'roles' => ['@'],
+//                    ],
+//                ],
+//            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [

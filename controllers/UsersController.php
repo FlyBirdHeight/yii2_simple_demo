@@ -37,6 +37,17 @@ class UsersController extends Controller
                 'class' => ReturnBehavior::className(),
                 'return_type' => 'json',
             ],
+            //            'access' => [
+//                'class' => AccessControl::className(),
+//                'rules' => [
+//                    [
+//                        'actions' => ['logout','rewrite-password'],
+//                            'only' => ['logout','rewrite-password'],
+//                        'allow' => true,
+//                        'roles' => ['@'],
+//                    ],
+//                ],
+//            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [

@@ -8,6 +8,7 @@ use app\events\CreateOrderItem;
 use app\models\Address;
 use app\models\Items;
 use Yii;
+use yii\filters\AccessControl;
 use app\models\Orders;
 use app\models\OrdersSearch;
 use yii\web\Controller;
@@ -42,6 +43,17 @@ class OrdersController extends Controller
                 'class' => ReturnBehavior::className(),
                 'return_type' => 'json',
             ],
+//            'access' => [
+//                'class' => AccessControl::className(),
+//                'rules' => [
+//                    [
+//                        'actions' => ['delete','create'],
+//                        'except' => ['find'],
+//                        'allow' => true,
+//                        'roles' => ['@'],
+//                    ],
+//                ],
+//            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [

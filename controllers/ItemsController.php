@@ -9,6 +9,7 @@ use Yii;
 use app\models\Items;
 use app\models\ItemsSearch;
 use yii\data\Pagination;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -30,6 +31,17 @@ class ItemsController extends Controller
                 'class' => ReturnBehavior::className(),
                 'return_type' => 'json',
             ],
+//            'access' => [
+//                'class' => AccessControl::className(),
+//                'rules' => [
+//                    [
+//                        'actions' => ['delete','create','update','find','upload'],
+//                        'except' => ['all'],
+//                        'allow' => true,
+//                        'roles' => ['@'],
+//                    ],
+//                ],
+//            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [

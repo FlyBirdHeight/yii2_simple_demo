@@ -12,6 +12,7 @@ namespace app\controllers;
 use app\components\ReturnBehavior;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
+use yii\filters\AccessControl;
 
 class ShopCarController extends Controller
 {
@@ -36,6 +37,16 @@ class ShopCarController extends Controller
                 'class' => ReturnBehavior::className(),
                 'return_type' => 'json',
             ],
+//            'access' => [
+//                'class' => AccessControl::className(),
+//                'rules' => [
+//                    [
+//                        'actions' => ['add','delete','update','get'],
+//                        'allow' => true,
+//                        'roles' => ['@'],
+//                    ],
+//                ],
+//            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
