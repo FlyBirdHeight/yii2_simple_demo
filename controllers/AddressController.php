@@ -19,6 +19,7 @@ use yii\filters\VerbFilter;
 class AddressController extends Controller
 {
     public $enableCsrfValidation = false;
+    public $modelClass = 'common\models\Address';
     /**
      * {@inheritdoc}
      */

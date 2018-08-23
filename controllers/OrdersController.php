@@ -21,7 +21,7 @@ use yii\filters\VerbFilter;
 class OrdersController extends Controller
 {
     public $enableCsrfValidation = false;
-
+    public $modelClass = 'common\models\Orders';
     private $redis;
 
     const EVENT_ADD_ORDER_COUNT = 'add_order_count';

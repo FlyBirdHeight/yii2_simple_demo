@@ -21,6 +21,7 @@ use yii\web\UploadedFile;
 class ItemsController extends Controller
 {
     public $enableCsrfValidation = false;
+    public $modelClass = 'common\models\Items';
     /**
      * {@inheritdoc}
      */

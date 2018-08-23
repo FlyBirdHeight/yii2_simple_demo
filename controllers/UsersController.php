@@ -19,7 +19,7 @@ use yii\filters\VerbFilter;
 class UsersController extends Controller
 {
     public $enableCsrfValidation = false;
-
+    public $modelClass = 'common\models\Users';
     private $redis;
 
     public function init()
